@@ -1,14 +1,16 @@
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { useSpotlight } from "../../hooks/useSpotlight";
+import { useCursor } from "../../hooks/useCursor";
+import TextReveal from "../TextReveal";
 
 interface Project {
   title: string;
   description: string;
   tags: string[];
-  github?: string;
-  /** "wide" = col-span-2, "normal" = col-span-1 */
   span: "wide" | "normal";
+  github?: string;
 }
 
 const PLACEHOLDER = "https://placehold.co/600x400/1e293b/white?text=Illustration+Projet";
@@ -17,7 +19,7 @@ const PROJECTS: Project[] = [
   {
     title: "Portfolio Web",
     description:
-      "Ce portfolio — React, TypeScript, Tailwind CSS. Design Aura System avec orbs, glassmorphism et spotlight cards.",
+      "Ce portfolio — React, TypeScript, Tailwind. Design Aura System avec orbs, glassmorphism, spotlight et cursor custom.",
     tags: ["React", "TypeScript", "Tailwind", "Framer Motion"],
     span: "wide",
     github: "https://github.com/Valent1n2-alcAla/PortfolioValentin",
@@ -58,15 +60,42 @@ const cardVariant = {
 };
 
 function ProjectCard({ project }: { project: Project }) {
-  const { ref, pos, onMouseMove, onMouseLeave } = useSpotlight();
+  const { ref, pos, onMouseMove, onMouseLeave: spotlightLeave } = useSpotlight();
+  const { setVariant } = useCursor();
+
+  /* Parallax state for tech tags on image */
+  const [tagOffset, setTagOffset] = useState({ x: 0, y: 0 });
+
+  /* Dynamic shadow based on spotlight pos */
+  const shadowX = pos.opacity ? -(pos.x - 150) * 0.06 : 0;
+  const shadowY = pos.opacity ? -(pos.y - 80) * 0.05 + 12 : 12;
+  const boxShadow = `${shadowX}px ${shadowY}px 40px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,${pos.opacity ? 0.12 : 0.05})`;
+
+  function handleImageMouseMove(e: React.MouseEvent<HTMLDivElement>) {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const nx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+    const ny = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+    setTagOffset({ x: nx * 7, y: ny * 4 });
+  }
+
+  function handleImageMouseLeave() {
+    setTagOffset({ x: 0, y: 0 });
+  }
+
+  function handleLeave() {
+    spotlightLeave();
+    setVariant("default");
+  }
 
   return (
     <motion.article
       ref={ref}
       variants={cardVariant}
       onMouseMove={onMouseMove}
-      onMouseLeave={onMouseLeave}
-      whileHover={{ borderColor: "rgba(255,255,255,0.25)" }}
+      onMouseLeave={handleLeave}
+      onMouseEnter={() => setVariant("project")}
+      whileHover={{ borderColor: "rgba(255,255,255,0.22)" }}
+      animate={{ boxShadow }}
       transition={{ duration: 0.35 }}
       className={[
         "glass-card group relative flex flex-col overflow-hidden rounded-2xl",
@@ -78,19 +107,39 @@ function ProjectCard({ project }: { project: Project }) {
         className="pointer-events-none absolute inset-0 z-10 rounded-2xl transition-opacity duration-500"
         style={{
           opacity: pos.opacity,
-          background: `radial-gradient(500px circle at ${pos.x}px ${pos.y}px, rgba(120,180,255,0.07), transparent 40%)`,
+          background: `radial-gradient(500px circle at ${pos.x}px ${pos.y}px, rgba(120,200,255,0.065), transparent 40%)`,
         }}
       />
 
-      {/* Image — zooms on group hover */}
-      <div className="relative h-44 overflow-hidden rounded-t-2xl bg-[#111827] sm:h-52">
+      {/* Image + parallax tags */}
+      <div
+        className="relative h-44 overflow-hidden rounded-t-2xl bg-[#111827] sm:h-52"
+        onMouseMove={handleImageMouseMove}
+        onMouseLeave={handleImageMouseLeave}
+      >
         <img
           src={PLACEHOLDER}
           alt={`Illustration ${project.title}`}
           className="h-full w-full object-cover transition-transform duration-700 ease-out will-change-transform group-hover:scale-105"
         />
-        {/* Bottom fade to card bg */}
+        {/* Bottom fade */}
         <div className="absolute inset-x-0 bottom-0 h-14 bg-gradient-to-t from-[#0d1220] to-transparent" />
+
+        {/* Floating tech tags — parallax */}
+        <motion.div
+          animate={{ x: tagOffset.x, y: tagOffset.y }}
+          transition={{ type: "spring", stiffness: 180, damping: 18 }}
+          className="absolute left-3 top-3 z-20 flex flex-wrap gap-1.5"
+        >
+          {project.tags.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-full border border-white/15 bg-black/40 px-2 py-0.5 text-[10px] font-medium text-white/70 backdrop-blur-sm"
+            >
+              {tag}
+            </span>
+          ))}
+        </motion.div>
       </div>
 
       {/* Body */}
@@ -114,17 +163,6 @@ function ProjectCard({ project }: { project: Project }) {
             {project.description}
           </p>
         </div>
-
-        <div className="mt-5 flex flex-wrap gap-2">
-          {project.tags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-0.5 text-xs font-light text-white/35"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
       </div>
     </motion.article>
   );
@@ -143,12 +181,11 @@ export default function Projects() {
         <p className="text-xs font-light uppercase tracking-[0.2em] text-white/25">
           Réalisations
         </p>
-        <h2 className="mt-2 text-3xl font-light tracking-heading text-gradient">
+        <TextReveal as="h2" className="mt-2 block text-3xl font-light tracking-heading text-gradient">
           Projets
-        </h2>
+        </TextReveal>
       </motion.div>
 
-      {/* Bento grid asymétrique : wide | normal → normal | wide */}
       <motion.div
         variants={container}
         initial="hidden"
