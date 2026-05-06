@@ -39,7 +39,7 @@ export default function About() {
             conception d'applications modernes.
           </p>
           <a
-            href="/CV_Valentin_Alcala.pdf"
+            href="/CV_Valentin_Alcala_Developpeur_Web_Alternance.pdf"
             download
             className="mt-6 inline-flex items-center gap-2 rounded-full border border-[#ececec] bg-white px-5 py-2.5 text-sm font-semibold text-[#111] shadow-sm transition-shadow hover:shadow-md"
           >
