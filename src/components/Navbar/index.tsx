@@ -1,29 +1,35 @@
 const NAV_LINKS = [
   { label: "Accueil", href: "#hero" },
   { label: "Projets", href: "#projects" },
+  { label: "Parcours", href: "#about" },
   { label: "Stack", href: "#stack" },
-  { label: "Contact", href: "#contact" },
 ];
 
 export default function Navbar() {
   return (
-    <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
-      <nav className="glass flex items-center justify-between rounded-2xl px-6 py-3 shadow-lg shadow-black/30">
-        <span className="text-sm font-semibold tracking-wide text-white">
-          V<span className="text-indigo-400">.</span>ALCALA
+    <header className="sticky top-0 z-50 bg-[#fafafa]/80 backdrop-blur-md border-b border-[#ececec]">
+      <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
+        <span className="text-sm font-semibold tracking-tight text-[#111]">
+          Valentin Alcala
         </span>
-        <ul className="flex gap-6">
+        <ul className="flex items-center gap-8">
           {NAV_LINKS.map(({ label, href }) => (
             <li key={href}>
               <a
                 href={href}
-                className="text-sm text-slate-400 transition-colors hover:text-white"
+                className="text-sm text-[#666] transition-colors duration-150 hover:text-[#111]"
               >
                 {label}
               </a>
             </li>
           ))}
         </ul>
+        <a
+          href="mailto:alcalavalentin55@gmail.com"
+          className="rounded-full bg-[#111] px-4 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-80"
+        >
+          Contact
+        </a>
       </nav>
     </header>
   );

@@ -1,48 +1,57 @@
 import { motion } from "framer-motion";
 import { config } from "../../data/config";
 
-const TECH_COLORS: Record<string, string> = {
-  "PHP":         "border-violet-500/40 bg-violet-500/10 text-violet-300",
-  "Symfony":     "border-violet-500/40 bg-violet-500/10 text-violet-300",
-  "Java":        "border-orange-500/40 bg-orange-500/10 text-orange-300",
-  "Spring Boot": "border-green-500/40  bg-green-500/10  text-green-300",
-  "Kotlin":      "border-purple-500/40 bg-purple-500/10 text-purple-300",
-  "JavaScript":  "border-yellow-500/40 bg-yellow-500/10 text-yellow-300",
-  "TypeScript":  "border-blue-500/40   bg-blue-500/10   text-blue-300",
-  "React":       "border-cyan-500/40   bg-cyan-500/10   text-cyan-300",
-  "HTML / CSS":  "border-red-500/40    bg-red-500/10    text-red-300",
-  "SQL":         "border-slate-500/40  bg-slate-500/10  text-slate-300",
+interface TechMeta {
+  color: string;
+  bg: string;
+  border: string;
+}
+
+const TECH_META: Record<string, TechMeta> = {
+  "PHP":         { color: "#7c3aed", bg: "#f5f3ff", border: "#ede9fe" },
+  "Symfony":     { color: "#1b1b1b", bg: "#f5f5f5", border: "#e5e5e5" },
+  "Java":        { color: "#c2410c", bg: "#fff7ed", border: "#fed7aa" },
+  "Spring Boot": { color: "#15803d", bg: "#f0fdf4", border: "#bbf7d0" },
+  "Kotlin":      { color: "#7c3aed", bg: "#faf5ff", border: "#e9d5ff" },
+  "JavaScript":  { color: "#a16207", bg: "#fefce8", border: "#fef08a" },
+  "TypeScript":  { color: "#1d4ed8", bg: "#eff6ff", border: "#bfdbfe" },
+  "React":       { color: "#0891b2", bg: "#ecfeff", border: "#a5f3fc" },
+  "HTML / CSS":  { color: "#b91c1c", bg: "#fef2f2", border: "#fecaca" },
+  "SQL":         { color: "#374151", bg: "#f9fafb", border: "#e5e7eb" },
 };
+
+const NEUTRAL: TechMeta = { color: "#555", bg: "#fafafa", border: "#ececec" };
 
 const container = {
   hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.07, delayChildren: 0.2 },
-  },
+  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } },
 };
 
 const item = {
-  hidden: { opacity: 0, scale: 0.8, y: 12 },
+  hidden: { opacity: 0, scale: 0.9, y: 8 },
   visible: {
     opacity: 1,
     scale: 1,
     y: 0,
-    transition: { duration: 0.35, ease: [0.22, 1, 0.36, 1] as const },
+    transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] as const },
   },
 };
 
 export default function TechStack() {
   return (
-    <section id="stack" className="mx-auto max-w-4xl px-6 py-24">
+    <section id="stack" className="mx-auto max-w-5xl px-6 py-24">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
-        className="text-center"
       >
-        <h2 className="text-2xl font-bold text-white">Stack Technique</h2>
-        <p className="mt-2 text-sm text-slate-500">Technologies maîtrisées</p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-[#aaa]">
+          Technologies
+        </p>
+        <h2 className="mt-2 text-3xl font-bold tracking-heading text-[#111]">
+          Stack
+        </h2>
       </motion.div>
 
       <motion.div
@@ -50,21 +59,29 @@ export default function TechStack() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        className="mt-10 flex flex-wrap justify-center gap-3"
+        className="mt-8 flex flex-wrap gap-3"
       >
-        {config.technologies.map((tech) => (
-          <motion.span
-            key={tech}
-            variants={item}
-            whileHover={{ scale: 1.08 }}
-            className={`inline-flex items-center rounded-xl border px-4 py-2 text-sm font-medium backdrop-blur-sm cursor-default ${
-              TECH_COLORS[tech] ??
-              "border-slate-700 bg-slate-800/60 text-slate-300"
-            }`}
-          >
-            {tech}
-          </motion.span>
-        ))}
+        {config.technologies.map((tech) => {
+          const meta = TECH_META[tech] ?? NEUTRAL;
+          return (
+            <motion.span
+              key={tech}
+              variants={item}
+              initial={{ color: "#888", backgroundColor: "#fafafa", borderColor: "#ececec" }}
+              whileHover={{
+                color: meta.color,
+                backgroundColor: meta.bg,
+                borderColor: meta.border,
+                scale: 1.04,
+                transition: { duration: 0.18 },
+              }}
+              style={{ border: "1px solid #ececec" }}
+              className="inline-flex cursor-default items-center rounded-full px-4 py-1.5 text-sm font-medium"
+            >
+              {tech}
+            </motion.span>
+          );
+        })}
       </motion.div>
     </section>
   );

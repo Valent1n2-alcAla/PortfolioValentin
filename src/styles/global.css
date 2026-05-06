@@ -5,32 +5,26 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   body {
-    @apply bg-slate-950 text-slate-100 antialiased;
+    @apply bg-[#fafafa] text-[#111] antialiased;
     margin: 0;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  * {
+    box-sizing: border-box;
   }
 }
 
 @layer utilities {
-  .grid-pattern {
-    background-image:
-      linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
-    background-size: 64px 64px;
+  .tracking-display {
+    letter-spacing: -0.04em;
   }
 
-  .radial-glow {
-    background: radial-gradient(
-      ellipse 80% 60% at 50% -10%,
-      rgba(99, 102, 241, 0.15) 0%,
-      transparent 70%
-    );
-  }
-
-  .glass {
-    @apply backdrop-blur-md border border-white/10 bg-white/5;
+  .tracking-heading {
+    letter-spacing: -0.025em;
   }
 }
