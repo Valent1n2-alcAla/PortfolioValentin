@@ -1,11 +1,13 @@
 import { motion } from "framer-motion";
 import { config } from "../../data/config";
 
+const ease = [0.16, 1, 0.3, 1] as const;
+
 function fadeUp(delay: number) {
   return {
-    initial: { opacity: 0, y: 20 },
+    initial: { opacity: 0, y: 28 },
     animate: { opacity: 1, y: 0 },
-    transition: { duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] as const },
+    transition: { duration: 0.8, delay, ease },
   };
 }
 
@@ -15,59 +17,60 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="mx-auto flex max-w-5xl flex-col items-start justify-center px-6 py-32 sm:py-40"
+      className="flex min-h-[92vh] flex-col items-center justify-center px-6 text-center"
     >
-      {/* Status pill */}
+      {/* Badge */}
       <motion.div {...fadeUp(0)} className="mb-8">
-        <span className="inline-flex items-center gap-2 rounded-full border border-[#ececec] bg-white px-3.5 py-1 text-xs font-medium text-[#555] shadow-sm">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-          Disponible — Alternance Septembre 2025
+        <span className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs font-light text-white/60 backdrop-blur-sm">
+          {/* Pulsing green dot */}
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+          </span>
+          Disponible pour alternance — MyDigitalSchool Caen
         </span>
       </motion.div>
 
-      {/* Heading */}
+      {/* Name */}
       <motion.h1
-        {...fadeUp(0.08)}
-        className="text-5xl font-bold tracking-display text-[#111] sm:text-7xl"
+        {...fadeUp(0.1)}
+        className="text-gradient text-5xl font-light tracking-display sm:text-7xl lg:text-8xl"
       >
         {name}
       </motion.h1>
 
+      {/* Role */}
+      <motion.p
+        {...fadeUp(0.2)}
+        className="mt-5 text-xl font-light text-white/35 tracking-wide"
+      >
+        Développeur Fullstack
+      </motion.p>
+
       {/* Tagline */}
       <motion.p
-        {...fadeUp(0.16)}
-        className="mt-5 max-w-xl text-lg font-normal leading-relaxed text-[#555]"
+        {...fadeUp(0.3)}
+        className="mt-4 max-w-lg text-sm font-light leading-relaxed text-white/35"
       >
-        Développeur Fullstack · Symfony, Spring Boot, React.{" "}
-        <span className="text-[#111] font-medium">
-          Futur Bachelor Web à MyDigitalSchool Caen.
-        </span>
+        Symfony · Spring Boot · React · Kotlin — Futur Bachelor Web à MyDigitalSchool Caen.
       </motion.p>
 
       {/* CTAs */}
       <motion.div
-        {...fadeUp(0.24)}
-        className="mt-10 flex flex-wrap items-center gap-3"
+        {...fadeUp(0.4)}
+        className="mt-12 flex flex-wrap items-center justify-center gap-4"
       >
         <a
           href={`mailto:${email}`}
-          className="rounded-full bg-[#111] px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-opacity hover:opacity-80"
+          className="rounded-full border border-white/15 bg-white/[0.06] px-7 py-2.5 text-sm font-light text-white/80 backdrop-blur-sm transition-all duration-300 hover:border-white/30 hover:bg-white/[0.10] hover:text-white"
         >
           Me contacter
         </a>
         <a
           href="#projects"
-          className="rounded-full border border-[#ececec] bg-white px-6 py-2.5 text-sm font-semibold text-[#111] shadow-sm transition-shadow hover:shadow-md"
+          className="rounded-full px-7 py-2.5 text-sm font-light text-white/35 transition-colors duration-300 hover:text-white/70"
         >
-          Voir mes projets
-        </a>
-        <a
-          href={config.social.github}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm font-medium text-[#888] underline-offset-4 transition-colors hover:text-[#111] hover:underline"
-        >
-          GitHub →
+          Voir mes projets →
         </a>
       </motion.div>
     </section>
