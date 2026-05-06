@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { config } from "../data/config";
+import { config } from "../../data/config";
 
 function fadeUp(delay: number) {
   return {
@@ -61,7 +61,7 @@ export default function Hero() {
         </a>
         <a
           href={`mailto:${email}`}
-          className="rounded-xl border border-slate-700 bg-slate-800/60 px-6 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-indigo-500/60 hover:text-white"
+          className="glass rounded-xl px-6 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-indigo-500/60 hover:text-white"
         >
           Me contacter
         </a>
