@@ -30,6 +30,24 @@ class ContactController extends AbstractController
             return $this->json(['error' => 'Corps de requête JSON invalide.'], Response::HTTP_BAD_REQUEST);
         }
 
+        // ── Honeypot : champ "website" doit rester vide (invisible pour les humains)
+        if (!empty($data['website'])) {
+            // On répond 201 pour ne pas signaler au bot qu'il a été détecté
+            return $this->json(['message' => 'Message enregistré avec succès.'], Response::HTTP_CREATED);
+        }
+
+        // ── Rate limiting basique : 1 envoi par IP toutes les 60 secondes
+        $ip = $request->getClientIp();
+        $cacheKey = 'contact_rate_' . md5((string) $ip);
+        $cacheFile = sys_get_temp_dir() . '/' . $cacheKey;
+
+        if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 60) {
+            return $this->json(
+                ['error' => 'Merci de patienter une minute avant de renvoyer un message.'],
+                Response::HTTP_TOO_MANY_REQUESTS,
+            );
+        }
+
         $contact = (new Contact())
             ->setName($data['name'] ?? '')
             ->setEmail($data['email'] ?? '')
@@ -49,6 +67,9 @@ class ContactController extends AbstractController
         $em->persist($contact);
         $em->flush();
 
+        // Marque l'IP comme ayant soumis
+        touch($cacheFile);
+
         $this->sendNotification($mailer, $contact);
 
         return $this->json(
@@ -65,9 +86,7 @@ class ContactController extends AbstractController
             ->replyTo(new Address($contact->getEmail(), $contact->getName()))
             ->subject('🚀 Nouveau contact Portfolio : ' . $contact->getSubject())
             ->htmlTemplate('emails/contact_notification.html.twig')
-            ->context([
-                'contact' => $contact,
-            ]);
+            ->context(['contact' => $contact]);
 
         $mailer->send($email);
     }
