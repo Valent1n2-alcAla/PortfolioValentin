@@ -142,7 +142,7 @@ export default function About() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-50" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cyan-500" />
             </span>
-            Disponible alternance 2024-2025 · MyDigitalSchool Caen
+            Disponible alternance 2025-2026 · MyDigitalSchool Caen
           </div>
 
           <CVPreview />
