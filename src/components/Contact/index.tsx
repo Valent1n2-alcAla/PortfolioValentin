@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, CheckCircle } from "lucide-react";
+import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { config } from "../../data/config";
 import TextReveal from "../TextReveal";
 import { useMagnetic } from "../../hooks/useMagnetic";
 
+const API_URL = "http://localhost:8000/api/contact";
 const ease = [0.22, 1, 0.36, 1] as const;
 
 interface FormValues { name: string; email: string; message: string }
 type FormField = keyof FormValues;
+type Status = "idle" | "submitting" | "success" | "error";
 
 function validate(field: FormField, value: string): string | undefined {
   if (field === "name" && !value.trim()) return "Votre nom est requis";
@@ -21,15 +23,15 @@ function validate(field: FormField, value: string): string | undefined {
 
 interface FieldProps {
   label: string; id: FormField; type?: string; rows?: number;
-  value: string; error?: string; touched: boolean;
+  value: string; error?: string; touched: boolean; disabled: boolean;
   onChange: (v: string) => void; onBlur: () => void;
 }
 
-function Field({ label, id, type = "text", rows, value, error, touched, onChange, onBlur }: FieldProps) {
+function Field({ label, id, type = "text", rows, value, error, touched, disabled, onChange, onBlur }: FieldProps) {
   const hasError = touched && error;
   const isOk     = touched && !error && value.trim();
 
-  const base = "w-full rounded-xl border bg-white px-4 py-3 text-sm text-[#1e293b] placeholder-[#cbd5e1] outline-none transition-all duration-200";
+  const base = "w-full rounded-xl border bg-white px-4 py-3 text-sm text-[#1e293b] placeholder-[#cbd5e1] outline-none transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed";
   const borderCls = hasError
     ? "border-red-300 focus:border-red-400"
     : isOk
@@ -42,18 +44,19 @@ function Field({ label, id, type = "text", rows, value, error, touched, onChange
         {label}
       </label>
       {rows ? (
-        <textarea id={id} rows={rows} value={value} placeholder={`Votre ${label.toLowerCase()}…`}
+        <textarea id={id} rows={rows} value={value} disabled={disabled}
+          placeholder={`Votre ${label.toLowerCase()}…`}
           className={`${base} ${borderCls} resize-none`}
           onChange={(e) => onChange(e.target.value)} onBlur={onBlur} />
       ) : (
-        <input id={id} type={type} value={value} placeholder={`Votre ${label.toLowerCase()}`}
+        <input id={id} type={type} value={value} disabled={disabled}
+          placeholder={`Votre ${label.toLowerCase()}`}
           className={`${base} ${borderCls}`}
           onChange={(e) => onChange(e.target.value)} onBlur={onBlur} />
       )}
       <AnimatePresence>
         {hasError && (
-          <motion.p
-            key="err"
+          <motion.p key="err"
             initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.2 }}
             className="mt-1 text-xs text-red-500"
@@ -66,33 +69,68 @@ function Field({ label, id, type = "text", rows, value, error, touched, onChange
   );
 }
 
+const EMPTY_FORM: FormValues = { name: "", email: "", message: "" };
+
 export default function Contact() {
-  const [form, setForm]       = useState<FormValues>({ name: "", email: "", message: "" });
+  const [form, setForm]       = useState<FormValues>(EMPTY_FORM);
   const [errors, setErrors]   = useState<Partial<FormValues>>({});
   const [touched, setTouched] = useState<Partial<Record<FormField, boolean>>>({});
-  const [submitted, setSubmitted] = useState(false);
+  const [status, setStatus]   = useState<Status>("idle");
 
   const { ref: btnRef, offset, onMouseMove, onMouseLeave } = useMagnetic<HTMLButtonElement>(0.22);
+
+  const isSubmitting = status === "submitting";
 
   function handleChange(field: FormField, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
     if (touched[field]) setErrors((e) => ({ ...e, [field]: validate(field, value) }));
   }
+
   function handleBlur(field: FormField) {
     setTouched((t) => ({ ...t, [field]: true }));
     setErrors((e) => ({ ...e, [field]: validate(field, form[field]) }));
   }
-  function handleSubmit(e: React.FormEvent) {
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
     const fields: FormField[] = ["name", "email", "message"];
     const newErrors: Partial<FormValues> = {};
+    const allTouched: Partial<Record<FormField, boolean>> = {};
+
     fields.forEach((f) => {
-      setTouched((t) => ({ ...t, [f]: true }));
+      allTouched[f] = true;
       const err = validate(f, form[f]);
       if (err) newErrors[f] = err;
     });
+
+    setTouched(allTouched);
     setErrors(newErrors);
-    if (Object.keys(newErrors).length === 0) setSubmitted(true);
+    if (Object.keys(newErrors).length > 0) return;
+
+    setStatus("submitting");
+
+    try {
+      const res = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name:    form.name,
+          email:   form.email,
+          subject: "Message depuis le portfolio",
+          message: form.message,
+        }),
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      setStatus("success");
+      setForm(EMPTY_FORM);
+      setTouched({});
+      setErrors({});
+    } catch {
+      setStatus("error");
+    }
   }
 
   return (
@@ -132,14 +170,21 @@ export default function Contact() {
 
         {/* Right */}
         <AnimatePresence mode="wait">
-          {submitted ? (
+          {status === "success" ? (
             <motion.div key="ok"
               initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, ease }}
               className="card flex flex-col items-center justify-center gap-4 rounded-2xl p-10 text-center"
             >
               <CheckCircle className="text-green-500" size={30} />
-              <p className="text-sm text-[#64748b]">Message envoyé. Je vous répondrai rapidement.</p>
+              <p className="text-sm font-medium text-[#1e293b]">Message envoyé, merci !</p>
+              <p className="text-xs text-[#94a3b8]">Je vous répondrai dans les plus brefs délais.</p>
+              <button
+                onClick={() => setStatus("idle")}
+                className="mt-2 text-xs text-green-600 underline underline-offset-2 hover:text-green-700"
+              >
+                Envoyer un autre message
+              </button>
             </motion.div>
           ) : (
             <motion.form key="form"
@@ -149,19 +194,35 @@ export default function Contact() {
               className="card flex flex-col gap-5 rounded-2xl p-6"
               noValidate
             >
-              <Field label="Nom"     id="name"    value={form.name}    error={errors.name}    touched={!!touched.name}    onChange={(v) => handleChange("name", v)}    onBlur={() => handleBlur("name")} />
-              <Field label="Email"   id="email"   type="email" value={form.email}   error={errors.email}   touched={!!touched.email}   onChange={(v) => handleChange("email", v)}   onBlur={() => handleBlur("email")} />
-              <Field label="Message" id="message" rows={4}     value={form.message} error={errors.message} touched={!!touched.message} onChange={(v) => handleChange("message", v)} onBlur={() => handleBlur("message")} />
+              <Field label="Nom"     id="name"    value={form.name}    error={errors.name}    touched={!!touched.name}    disabled={isSubmitting} onChange={(v) => handleChange("name", v)}    onBlur={() => handleBlur("name")} />
+              <Field label="Email"   id="email"   type="email" value={form.email}   error={errors.email}   touched={!!touched.email}   disabled={isSubmitting} onChange={(v) => handleChange("email", v)}   onBlur={() => handleBlur("email")} />
+              <Field label="Message" id="message" rows={4}     value={form.message} error={errors.message} touched={!!touched.message} disabled={isSubmitting} onChange={(v) => handleChange("message", v)} onBlur={() => handleBlur("message")} />
+
+              {/* API error banner */}
+              <AnimatePresence>
+                {status === "error" && (
+                  <motion.div key="api-err"
+                    initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.2 }}
+                    className="flex items-center gap-2 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600"
+                  >
+                    <AlertCircle size={14} className="flex-shrink-0" />
+                    Oups, une erreur est survenue. Réessayez ou contactez-moi par email.
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               <motion.button
-                ref={btnRef} type="submit"
+                ref={btnRef} type="submit" disabled={isSubmitting}
                 animate={{ x: offset.x, y: offset.y }}
                 transition={{ type: "spring", stiffness: 300, damping: 20, mass: 0.5 }}
                 onMouseMove={onMouseMove} onMouseLeave={onMouseLeave}
-                className="mt-1 inline-flex items-center gap-2 self-start rounded-full bg-green-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-green-700"
+                className="mt-1 inline-flex items-center gap-2 self-start rounded-full bg-green-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                <Send size={13} />
-                Envoyer
+                {isSubmitting
+                  ? <><Loader2 size={13} className="animate-spin" /> Envoi…</>
+                  : <><Send size={13} /> Envoyer</>
+                }
               </motion.button>
             </motion.form>
           )}
