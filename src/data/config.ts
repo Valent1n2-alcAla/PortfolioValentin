@@ -27,7 +27,7 @@ export const projects: Project[] = [
     span: "wide",
     github: GITHUB,
     badge: "IA • Odin",
-    image: "https://placehold.co/800x420/f0fdf4/059669?text=InterVizio",
+    image: "./public/img/intervizio.jpg",
   },
   {
     title: "E-Music",
@@ -42,7 +42,7 @@ export const projects: Project[] = [
     tags: ["Symfony 7", "PHP 8.2", "MariaDB", "Turbo", "Stimulus"],
     span: "normal",
     github: GITHUB,
-    image: "https://placehold.co/600x420/f0fdf4/059669?text=E-Music",
+    image: "./public/img/emusic.jpg",
   },
   {
     title: "Portfolio 2026",
@@ -57,7 +57,7 @@ export const projects: Project[] = [
     tags: ["React", "TypeScript", "Framer Motion", "Tailwind CSS"],
     span: "normal",
     github: GITHUB,
-    image: "https://placehold.co/600x420/f0fdf4/059669?text=Portfolio+2026",
+    image: "./public/portfolio-2026.png",
   },
 ];
 
