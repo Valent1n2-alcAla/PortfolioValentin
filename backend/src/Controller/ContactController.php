@@ -60,7 +60,7 @@ class ContactController extends AbstractController
             );
 
             $email = (new Email())
-                ->from(new Address('noreply@portfolio-valentin.fr', 'Portfolio Valentin'))
+                ->from(new Address('alcalavalentin55@gmail.com', 'Portfolio Valentin'))
                 ->to('alcalavalentin55@gmail.com')
                 ->replyTo(new Address($contact->getEmail(), $contact->getName()))
                 ->subject('🚀 Nouveau contact : ' . $contact->getSubject())
