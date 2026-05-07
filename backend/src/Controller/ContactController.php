@@ -104,7 +104,7 @@ class ContactController extends AbstractController
     private function sendNotification(MailerInterface $mailer, Contact $contact): void
     {
         $from = $_ENV['MAILER_FROM'] ?? 'noreply@portfolio-valentin.fr';
-        $to   = $_ENV['MAILER_TO']   ?? 'alcalavalentin55@gmail.com';
+        $to   = 'alcalavalentin55@gmail.com';
 
         $email = (new TemplatedEmail())
             ->from(new Address($from, 'Portfolio Valentin'))
