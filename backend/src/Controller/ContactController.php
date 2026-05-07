@@ -4,10 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Contact;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
@@ -19,6 +22,7 @@ class ContactController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         ValidatorInterface $validator,
+        MailerInterface $mailer,
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
@@ -45,9 +49,26 @@ class ContactController extends AbstractController
         $em->persist($contact);
         $em->flush();
 
+        $this->sendNotification($mailer, $contact);
+
         return $this->json(
             ['message' => 'Message enregistré avec succès.', 'id' => $contact->getId()],
             Response::HTTP_CREATED,
         );
+    }
+
+    private function sendNotification(MailerInterface $mailer, Contact $contact): void
+    {
+        $email = (new TemplatedEmail())
+            ->from(new Address($_ENV['MAILER_FROM'], 'Portfolio Valentin'))
+            ->to(new Address($_ENV['MAILER_TO']))
+            ->replyTo(new Address($contact->getEmail(), $contact->getName()))
+            ->subject('🚀 Nouveau contact Portfolio : ' . $contact->getSubject())
+            ->htmlTemplate('emails/contact_notification.html.twig')
+            ->context([
+                'contact' => $contact,
+            ]);
+
+        $mailer->send($email);
     }
 }
