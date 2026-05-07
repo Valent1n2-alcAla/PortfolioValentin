@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowUpRight, Github, Sparkles } from "lucide-react";
+import { Github, Sparkles } from "lucide-react";
 import { projects, type Project } from "../../data/config";
 import TextReveal from "../TextReveal";
 
@@ -43,58 +43,20 @@ function ProjectCard({ project }: { project: Project }) {
       </div>
 
       {/* Body */}
-      <div className="flex flex-1 flex-col justify-between p-6">
+      <div className="flex items-center justify-between gap-3 px-5 py-4">
         <div>
-          {/* Title row */}
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h3 className="text-lg font-bold text-[#1e293b] leading-snug">{project.title}</h3>
-              <p className="mt-0.5 text-xs font-semibold uppercase tracking-wide text-emerald-600">
-                {project.subtitle}
-              </p>
-            </div>
-            <a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Voir sur GitHub"
-              className="mt-0.5 flex-shrink-0 rounded-full p-1.5 text-slate-300 transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 group-hover:text-emerald-500"
-            >
-              <Github size={15} strokeWidth={1.8} />
-            </a>
-          </div>
-
-          {/* Description */}
-          <p className="mt-3 text-sm leading-relaxed text-[#64748b]">
-            {project.description}
-          </p>
-
-          {/* Highlights */}
-          <ul className="mt-3 space-y-1.5">
-            {project.highlights.map((h) => (
-              <li key={h} className="flex items-start gap-2 text-sm text-[#475569]">
-                <ArrowUpRight
-                  size={13}
-                  className="mt-0.5 flex-shrink-0 text-emerald-500"
-                  strokeWidth={2}
-                />
-                {h}
-              </li>
-            ))}
-          </ul>
+          <h3 className="text-base font-bold leading-snug text-[#1e293b]">{project.title}</h3>
+          <p className="mt-0.5 text-sm text-slate-500">{project.subtitle}</p>
         </div>
-
-        {/* Tech badges */}
-        <div className="mt-5 flex flex-wrap gap-1.5">
-          {project.tags.map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full border border-emerald-100 bg-emerald-50/70 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-600"
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
+        <a
+          href={project.github}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Voir sur GitHub"
+          className="flex-shrink-0 rounded-full p-1.5 text-slate-300 transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 group-hover:text-emerald-500"
+        >
+          <Github size={15} strokeWidth={1.8} />
+        </a>
       </div>
     </motion.article>
   );
