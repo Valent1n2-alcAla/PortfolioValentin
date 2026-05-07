@@ -1,26 +1,25 @@
 import { motion } from "framer-motion";
 import { config } from "../../data/config";
+import TextReveal from "../TextReveal";
 
-const ease = [0.16, 1, 0.3, 1] as const;
+const ease = [0.22, 1, 0.36, 1] as const;
 
-interface TechColor {
-  color: string;
-  bg: string;
-  border: string;
-}
+interface TechMeta { color: string; bg: string; border: string }
 
-const TECH_COLOR: Record<string, TechColor> = {
-  "PHP":         { color: "#a78bfa", bg: "rgba(139,92,246,0.08)",  border: "rgba(139,92,246,0.2)"  },
-  "Symfony":     { color: "#e2e8f0", bg: "rgba(226,232,240,0.06)", border: "rgba(226,232,240,0.15)" },
-  "Java":        { color: "#fb923c", bg: "rgba(251,146,60,0.08)",  border: "rgba(251,146,60,0.2)"  },
-  "Spring Boot": { color: "#4ade80", bg: "rgba(74,222,128,0.07)",  border: "rgba(74,222,128,0.18)" },
-  "Kotlin":      { color: "#c084fc", bg: "rgba(192,132,252,0.08)", border: "rgba(192,132,252,0.2)" },
-  "JavaScript":  { color: "#fbbf24", bg: "rgba(251,191,36,0.07)",  border: "rgba(251,191,36,0.18)" },
-  "TypeScript":  { color: "#60a5fa", bg: "rgba(96,165,250,0.07)",  border: "rgba(96,165,250,0.18)" },
-  "React":       { color: "#22d3ee", bg: "rgba(34,211,238,0.07)",  border: "rgba(34,211,238,0.18)" },
-  "HTML / CSS":  { color: "#f87171", bg: "rgba(248,113,113,0.07)", border: "rgba(248,113,113,0.18)" },
-  "SQL":         { color: "#94a3b8", bg: "rgba(148,163,184,0.07)", border: "rgba(148,163,184,0.15)" },
+const TECH_META: Record<string, TechMeta> = {
+  "PHP":         { color: "#7c3aed", bg: "#f5f3ff", border: "#ede9fe" },
+  "Symfony":     { color: "#1e293b", bg: "#f8fafc", border: "#e2e8f0" },
+  "Java":        { color: "#c2410c", bg: "#fff7ed", border: "#fed7aa" },
+  "Spring Boot": { color: "#15803d", bg: "#f0fdf4", border: "#bbf7d0" },
+  "Kotlin":      { color: "#7c3aed", bg: "#faf5ff", border: "#e9d5ff" },
+  "JavaScript":  { color: "#a16207", bg: "#fefce8", border: "#fef08a" },
+  "TypeScript":  { color: "#1d4ed8", bg: "#eff6ff", border: "#bfdbfe" },
+  "React":       { color: "#0891b2", bg: "#ecfeff", border: "#a5f3fc" },
+  "HTML / CSS":  { color: "#b91c1c", bg: "#fef2f2", border: "#fecaca" },
+  "SQL":         { color: "#374151", bg: "#f9fafb", border: "#e5e7eb" },
 };
+
+const NEUTRAL: TechMeta = { color: "#475569", bg: "#f8fafc", border: "#e2e8f0" };
 
 const container = {
   hidden: {},
@@ -28,64 +27,57 @@ const container = {
 };
 
 const item = {
-  hidden: { opacity: 0, scale: 0.88, y: 10 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: { duration: 0.6, ease },
-  },
+  hidden:  { opacity: 0, scale: 0.88, y: 10 },
+  visible: { opacity: 1, scale: 1, y: 0, transition: { duration: 0.45, ease } },
 };
 
 export default function TechStack() {
   return (
     <section id="stack" className="mx-auto max-w-5xl px-6 py-24">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, ease }}
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.65, ease }}
         className="mb-10"
       >
-        <p className="text-xs font-light uppercase tracking-[0.2em] text-white/25">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-green-600">
           Technologies
         </p>
-        <h2 className="mt-2 text-3xl font-light tracking-heading text-gradient">
+        <TextReveal
+          as="h2"
+          className="font-display mt-2 block text-3xl font-medium tracking-display text-[#1e293b]"
+        >
           Stack
-        </h2>
+        </TextReveal>
       </motion.div>
 
       <motion.div
         variants={container}
         initial="hidden"
         whileInView="visible"
-        viewport={{ once: true }}
+        viewport={{ once: true, margin: "-60px" }}
         className="flex flex-wrap gap-3"
       >
         {config.technologies.map((tech) => {
-          const col = TECH_COLOR[tech] ?? {
-            color: "rgba(255,255,255,0.5)",
-            bg: "rgba(255,255,255,0.03)",
-            border: "rgba(255,255,255,0.08)",
-          };
-
+          const meta = TECH_META[tech] ?? NEUTRAL;
           return (
             <motion.span
               key={tech}
               variants={item}
               whileHover={{
-                color: col.color,
-                backgroundColor: col.bg,
-                borderColor: col.border,
+                color: meta.color,
+                backgroundColor: meta.bg,
+                borderColor: meta.border,
                 scale: 1.05,
-                transition: { duration: 0.25 },
+                transition: { duration: 0.18 },
               }}
               style={{
-                color: "rgba(255,255,255,0.3)",
-                backgroundColor: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.07)",
+                color: "#64748b",
+                backgroundColor: "#ffffff",
+                border: "1px solid #e2e8f0",
               }}
-              className="inline-flex cursor-default items-center rounded-full px-4 py-1.5 text-sm font-light backdrop-blur-sm"
+              className="inline-flex cursor-default items-center rounded-full px-4 py-1.5 text-sm font-medium"
             >
               {tech}
             </motion.span>
