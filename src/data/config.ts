@@ -31,7 +31,7 @@ export const projects: Project[] = [
   },
   {
     title: "E-Music",
-    subtitle: "Projet en cours",
+    subtitle: "Réalisé en formation",
     description:
       "Solution full-stack Admin / Profs / Élèves pour la gestion administrative et pédagogique d'un établissement musical.",
     highlights: [
