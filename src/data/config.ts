@@ -15,7 +15,7 @@ const GITHUB = "https://github.com/Valent1n2-alcAla";
 export const projects: Project[] = [
   {
     title: "InterVizio",
-    subtitle: "Réalisé en stage",
+    subtitle: "Projet réalisé en stage",
     description:
       "Plateforme de pilotage pour interventions techniques terrain. Conçue pour rationaliser le cycle complet, de la demande client à la pré-facturation.",
     highlights: [
@@ -31,7 +31,7 @@ export const projects: Project[] = [
   },
   {
     title: "E-Music",
-    subtitle: "Réalisé en formation",
+    subtitle: "Projet en cours de développement",
     description:
       "Solution full-stack Admin / Profs / Élèves pour la gestion administrative et pédagogique d'un établissement musical.",
     highlights: [

@@ -19,21 +19,19 @@ function ProjectCard({ project }: { project: Project }) {
   return (
     <motion.article
       variants={item}
-      whileHover={{ y: -6, scale: 1.02, transition: { duration: 0.22, ease } }}
+      whileHover={{ y: -4, transition: { duration: 0.22, ease } }}
       className={[
-        "group flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm",
-        "transition-shadow duration-300 hover:shadow-md",
+        "group overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm transition-shadow duration-300 hover:shadow-md",
         project.span === "wide" ? "sm:col-span-2" : "",
       ].join(" ")}
     >
       {/* Image */}
-      <div className="relative aspect-video w-full overflow-hidden border-b border-slate-100 bg-slate-50">
+      <div className="relative aspect-video w-full overflow-hidden bg-slate-50">
         <img
           src={project.image}
           alt={`Aperçu ${project.title}`}
-          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
-        {/* AI badge */}
         {project.badge && (
           <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 backdrop-blur-sm">
             <Sparkles size={10} />
@@ -42,11 +40,11 @@ function ProjectCard({ project }: { project: Project }) {
         )}
       </div>
 
-      {/* Body */}
+      {/* Footer */}
       <div className="flex items-center justify-between gap-3 px-5 py-4">
         <div>
-          <h3 className="text-base font-bold leading-snug text-[#1e293b]">{project.title}</h3>
-          <p className="mt-0.5 text-sm text-slate-500">{project.subtitle}</p>
+          <h3 className="text-sm font-bold text-[#1e293b]">{project.title}</h3>
+          <p className="mt-0.5 text-xs text-slate-500">{project.subtitle}</p>
         </div>
         <a
           href={project.github}
@@ -55,7 +53,7 @@ function ProjectCard({ project }: { project: Project }) {
           aria-label="Voir sur GitHub"
           className="flex-shrink-0 rounded-full p-1.5 text-slate-300 transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 group-hover:text-emerald-500"
         >
-          <Github size={15} strokeWidth={1.8} />
+          <Github size={14} strokeWidth={1.8} />
         </a>
       </div>
     </motion.article>
@@ -65,7 +63,6 @@ function ProjectCard({ project }: { project: Project }) {
 export default function Projects() {
   return (
     <section id="projects" className="mx-auto max-w-5xl px-6 py-24">
-      {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.98 }}
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -84,7 +81,6 @@ export default function Projects() {
         </TextReveal>
       </motion.div>
 
-      {/* Bento grid */}
       <motion.div
         variants={container}
         initial="hidden"
