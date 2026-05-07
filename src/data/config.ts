@@ -14,7 +14,6 @@ export const projects: Project[] = [
     subtitle: "Projet réalisé en stage",
     span: "wide",
     github: GITHUB,
-    badge: "IA • Odin",
     image: "./public/img/intervizio.jpg",
   },
   {
