@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { ArrowUpRight, Sparkles } from "lucide-react";
+import { ArrowUpRight, Github, Sparkles } from "lucide-react";
 import { projects, type Project } from "../../data/config";
 import TextReveal from "../TextReveal";
 
@@ -11,30 +11,31 @@ const container = {
 };
 
 const item = {
-  hidden:   { opacity: 0, y: 28, scale: 0.97 },
-  visible:  { opacity: 1, y: 0,  scale: 1, transition: { duration: 0.65, ease } },
+  hidden:  { opacity: 0, y: 28, scale: 0.97 },
+  visible: { opacity: 1, y: 0,  scale: 1, transition: { duration: 0.65, ease } },
 };
 
 function ProjectCard({ project }: { project: Project }) {
   return (
     <motion.article
       variants={item}
-      whileHover={{ y: -4, transition: { duration: 0.25 } }}
+      whileHover={{ y: -6, scale: 1.02, transition: { duration: 0.22, ease } }}
       className={[
-        "card group flex flex-col overflow-hidden rounded-3xl transition-shadow duration-300",
+        "group flex flex-col overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-sm",
+        "transition-shadow duration-300 hover:shadow-md",
         project.span === "wide" ? "sm:col-span-2" : "",
       ].join(" ")}
     >
       {/* Image */}
-      <div className="relative aspect-video w-full overflow-hidden border-b border-[#e2e8f0] bg-white">
+      <div className="relative aspect-video w-full overflow-hidden border-b border-slate-100 bg-slate-50">
         <img
           src={project.image}
           alt={`Aperçu ${project.title}`}
-          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
         />
         {/* AI badge */}
         {project.badge && (
-          <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-green-200 bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-green-700 backdrop-blur-sm">
+          <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 backdrop-blur-sm">
             <Sparkles size={10} />
             {project.badge}
           </span>
@@ -47,17 +48,19 @@ function ProjectCard({ project }: { project: Project }) {
           {/* Title row */}
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h3 className="text-base font-semibold text-[#1e293b]">{project.title}</h3>
-              <p className="mt-0.5 text-xs font-medium text-green-600">{project.subtitle}</p>
+              <h3 className="text-lg font-bold text-[#1e293b] leading-snug">{project.title}</h3>
+              <p className="mt-0.5 text-xs font-semibold uppercase tracking-wide text-emerald-600">
+                {project.subtitle}
+              </p>
             </div>
             <a
               href={project.github}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Voir sur GitHub"
-              className="mt-0.5 flex-shrink-0 text-[#cbd5e1] transition-colors duration-200 group-hover:text-green-600"
+              className="mt-0.5 flex-shrink-0 rounded-full p-1.5 text-slate-300 transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 group-hover:text-emerald-500"
             >
-              <ArrowUpRight size={16} />
+              <Github size={15} strokeWidth={1.8} />
             </a>
           </div>
 
@@ -70,19 +73,23 @@ function ProjectCard({ project }: { project: Project }) {
           <ul className="mt-3 space-y-1.5">
             {project.highlights.map((h) => (
               <li key={h} className="flex items-start gap-2 text-sm text-[#475569]">
-                <span className="mt-1.5 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-green-500" />
+                <ArrowUpRight
+                  size={13}
+                  className="mt-0.5 flex-shrink-0 text-emerald-500"
+                  strokeWidth={2}
+                />
                 {h}
               </li>
             ))}
           </ul>
         </div>
 
-        {/* Tags */}
+        {/* Tech badges */}
         <div className="mt-5 flex flex-wrap gap-1.5">
           {project.tags.map((tag) => (
             <span
               key={tag}
-              className="rounded-full border border-green-100 bg-green-50 px-2.5 py-0.5 text-[11px] font-medium text-green-700"
+              className="rounded-full border border-emerald-100 bg-emerald-50/70 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-600"
             >
               {tag}
             </span>
@@ -104,7 +111,7 @@ export default function Projects() {
         transition={{ duration: 0.65, ease }}
         className="mb-10"
       >
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-green-600">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-600">
           Réalisations
         </p>
         <TextReveal
@@ -121,7 +128,7 @@ export default function Projects() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-60px" }}
-        className="grid grid-cols-1 gap-4 sm:grid-cols-2"
+        className="grid grid-cols-1 gap-5 sm:grid-cols-2"
       >
         {projects.map((project) => (
           <ProjectCard key={project.title} project={project} />
