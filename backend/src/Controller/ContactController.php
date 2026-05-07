@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Attribute\Route;
@@ -24,22 +25,24 @@ class ContactController extends AbstractController
         ValidatorInterface $validator,
         MailerInterface $mailer,
     ): JsonResponse {
+        // ── 1. Décodage JSON ─────────────────────────────────────────────────
         $data = json_decode($request->getContent(), true);
 
-        if (!$data) {
-            return $this->json(['error' => 'Corps de requête JSON invalide.'], Response::HTTP_BAD_REQUEST);
+        if (!is_array($data)) {
+            return $this->json(
+                ['error' => 'Corps de requête JSON invalide.', 'detail' => json_last_error_msg()],
+                Response::HTTP_BAD_REQUEST,
+            );
         }
 
-        // ── Honeypot : champ "website" doit rester vide (invisible pour les humains)
+        // ── 2. Honeypot ──────────────────────────────────────────────────────
         if (!empty($data['website'])) {
-            // On répond 201 pour ne pas signaler au bot qu'il a été détecté
             return $this->json(['message' => 'Message enregistré avec succès.'], Response::HTTP_CREATED);
         }
 
-        // ── Rate limiting basique : 1 envoi par IP toutes les 60 secondes
-        $ip = $request->getClientIp();
-        $cacheKey = 'contact_rate_' . md5((string) $ip);
-        $cacheFile = sys_get_temp_dir() . '/' . $cacheKey;
+        // ── 3. Rate limiting (1 envoi / IP / 60 s) ──────────────────────────
+        $ip       = $request->getClientIp() ?? 'unknown';
+        $cacheFile = sys_get_temp_dir() . '/contact_rate_' . md5($ip);
 
         if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < 60) {
             return $this->json(
@@ -48,6 +51,7 @@ class ContactController extends AbstractController
             );
         }
 
+        // ── 4. Hydratation & validation ──────────────────────────────────────
         $contact = (new Contact())
             ->setName($data['name'] ?? '')
             ->setEmail($data['email'] ?? '')
@@ -64,13 +68,32 @@ class ContactController extends AbstractController
             return $this->json(['errors' => $errors], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $em->persist($contact);
-        $em->flush();
+        // ── 5. Persistance ───────────────────────────────────────────────────
+        try {
+            $em->persist($contact);
+            $em->flush();
+        } catch (\Throwable $e) {
+            return $this->json(
+                [
+                    'error'  => 'Impossible d\'enregistrer le message en base de données.',
+                    'detail' => $this->getParam('kernel.environment') === 'dev' ? $e->getMessage() : null,
+                ],
+                Response::HTTP_INTERNAL_SERVER_ERROR,
+            );
+        }
 
-        // Marque l'IP comme ayant soumis
         touch($cacheFile);
 
-        $this->sendNotification($mailer, $contact);
+        // ── 6. Notification email (non bloquante) ────────────────────────────
+        try {
+            $this->sendNotification($mailer, $contact);
+        } catch (TransportExceptionInterface $e) {
+            // L'email a échoué mais le message est déjà sauvegardé : on log et on continue
+            // En production, remplace par un vrai logger (LoggerInterface)
+            error_log('[Portfolio] Mailer error: ' . $e->getMessage());
+        } catch (\Throwable $e) {
+            error_log('[Portfolio] Unexpected mailer error: ' . $e->getMessage());
+        }
 
         return $this->json(
             ['message' => 'Message enregistré avec succès.', 'id' => $contact->getId()],
@@ -80,14 +103,22 @@ class ContactController extends AbstractController
 
     private function sendNotification(MailerInterface $mailer, Contact $contact): void
     {
+        $from = $_ENV['MAILER_FROM'] ?? 'noreply@portfolio-valentin.fr';
+        $to   = $_ENV['MAILER_TO']   ?? 'alcalavalentin55@gmail.com';
+
         $email = (new TemplatedEmail())
-            ->from(new Address($_ENV['MAILER_FROM'], 'Portfolio Valentin'))
-            ->to(new Address($_ENV['MAILER_TO']))
+            ->from(new Address($from, 'Portfolio Valentin'))
+            ->to(new Address($to))
             ->replyTo(new Address($contact->getEmail(), $contact->getName()))
             ->subject('🚀 Nouveau contact Portfolio : ' . $contact->getSubject())
             ->htmlTemplate('emails/contact_notification.html.twig')
             ->context(['contact' => $contact]);
 
         $mailer->send($email);
+    }
+
+    private function getParam(string $name): mixed
+    {
+        return $this->getParameter($name);
     }
 }
