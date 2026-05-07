@@ -1,114 +1,87 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Download, FileText, GraduationCap, Languages } from "lucide-react";
+import { motion } from "framer-motion";
+import { Download, GraduationCap, Languages } from "lucide-react";
 import { config } from "../../data/config";
 import TextReveal from "../TextReveal";
 import { useMagnetic } from "../../hooks/useMagnetic";
 
-const ease = [0.16, 1, 0.3, 1] as const;
+const ease = [0.22, 1, 0.36, 1] as const;
 
 const container = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.14, delayChildren: 0.05 } },
+  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.05 } },
 };
 
 const row = {
-  hidden: { opacity: 0, x: -20 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.8, ease } },
+  hidden:  { opacity: 0, x: -18 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.65, ease } },
 };
 
-function SectionLabel({ children }: { children: string }) {
-  return (
-    <p className="text-xs font-light uppercase tracking-[0.2em] text-white/25">
-      {children}
-    </p>
-  );
-}
-
-/* CV mini preview — expands on hover */
-function CVPreview() {
-  const [open, setOpen] = useState(false);
-  const { ref, offset, onMouseMove, onMouseLeave } = useMagnetic<HTMLAnchorElement>(0.2);
+/* ─── CV Card ────────────────────────────────────────────── */
+function CVCard() {
+  const { ref, offset, onMouseMove, onMouseLeave } = useMagnetic<HTMLAnchorElement>(0.18);
 
   return (
-    <motion.div
-      onHoverStart={() => setOpen(true)}
-      onHoverEnd={() => setOpen(false)}
-      className="mt-7"
-    >
-      <motion.div
-        animate={{ height: open ? 220 : 52 }}
-        transition={{ duration: 0.45, ease }}
-        className="glass-card overflow-hidden rounded-2xl"
-      >
-        {/* Header row — always visible */}
-        <div className="flex items-center gap-3 px-5 py-3.5">
-          <FileText size={14} className="flex-shrink-0 text-white/40" />
-          <span className="text-sm font-light text-white/55">
-            Curriculum Vitae
-          </span>
-          <motion.span
-            animate={{ rotate: open ? 180 : 0 }}
-            transition={{ duration: 0.3 }}
-            className="ml-auto text-white/25"
-          >
-            ↓
-          </motion.span>
+    <div className="card mt-8 overflow-hidden rounded-2xl">
+      {/* Card header */}
+      <div className="border-b border-[#e2e8f0] px-5 py-4">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-50">
+            <span className="text-sm font-bold text-green-700">VA</span>
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-[#1e293b]">
+              {config.identity.name}
+            </p>
+            <p className="text-xs text-[#64748b]">{config.identity.role}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Infos */}
+      <div className="px-5 py-4 space-y-3">
+        <div className="flex items-start gap-2">
+          <GraduationCap size={13} className="mt-0.5 flex-shrink-0 text-green-600" />
+          <p className="text-xs text-[#64748b]">
+            {config.education[1].school} · {config.education[1].year}
+          </p>
+        </div>
+        <div className="flex items-start gap-2">
+          <Languages size={13} className="mt-0.5 flex-shrink-0 text-green-600" />
+          <p className="text-xs text-[#64748b]">
+            {config.languages.map((l) => `${l.name} (${l.level})`).join(" · ")}
+          </p>
         </div>
 
-        {/* Expanded preview */}
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="border-t border-white/[0.06] px-5 pb-5 pt-4"
+        {/* Top techs */}
+        <div className="flex flex-wrap gap-1.5 pt-1">
+          {config.technologies.slice(0, 6).map((tech) => (
+            <span
+              key={tech}
+              className="rounded-full border border-green-100 bg-green-50 px-2.5 py-0.5 text-[11px] font-medium text-green-700"
             >
-              {/* Mini CV content */}
-              <div className="mb-3 flex items-center gap-2 text-xs text-white/30">
-                <GraduationCap size={11} />
-                <span className="font-light">
-                  {config.education[1].school} · {config.education[1].year}
-                </span>
-              </div>
-              <div className="mb-4 flex items-center gap-2 text-xs text-white/30">
-                <Languages size={11} />
-                <span className="font-light">
-                  {config.languages.map((l) => `${l.name} ${l.level}`).join(" · ")}
-                </span>
-              </div>
-              <div className="mb-5 flex flex-wrap gap-1.5">
-                {config.technologies.slice(0, 6).map((t) => (
-                  <span
-                    key={t}
-                    className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2 py-0.5 text-[10px] text-white/30"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
+              {tech}
+            </span>
+          ))}
+        </div>
+      </div>
 
-              {/* Download button — magnetic */}
-              <motion.a
-                ref={ref}
-                href="/CV_Valentin_Alcala.pdf"
-                download
-                animate={{ x: offset.x, y: offset.y }}
-                transition={{ type: "spring", stiffness: 300, damping: 20, mass: 0.5 }}
-                onMouseMove={onMouseMove}
-                onMouseLeave={onMouseLeave}
-                className="inline-flex items-center gap-2 rounded-full border border-cyan-500/25 bg-cyan-500/[0.07] px-4 py-2 text-xs font-light text-cyan-400/80 transition-all hover:border-cyan-500/40 hover:text-cyan-300"
-              >
-                <Download size={11} />
-                Télécharger CV
-              </motion.a>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-    </motion.div>
+      {/* Download button — green fill on hover */}
+      <div className="border-t border-[#e2e8f0] px-5 py-4">
+        <motion.a
+          ref={ref}
+          href="/CV_Valentin_Alcala.pdf"
+          download
+          animate={{ x: offset.x, y: offset.y }}
+          transition={{ type: "spring", stiffness: 300, damping: 20, mass: 0.5 }}
+          onMouseMove={onMouseMove}
+          onMouseLeave={onMouseLeave}
+          className="group inline-flex items-center gap-2 rounded-full border border-green-600 px-5 py-2 text-sm font-medium text-green-600 transition-all duration-300 hover:bg-green-600 hover:text-white"
+        >
+          <Download size={13} />
+          Télécharger le PDF complet
+        </motion.a>
+      </div>
+    </div>
   );
 }
 
@@ -116,57 +89,59 @@ export default function About() {
   return (
     <section id="about" className="mx-auto max-w-5xl px-6 py-24">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, ease }}
+        initial={{ opacity: 0, y: 20, scale: 0.98 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: 0.65, ease }}
         className="flex flex-col gap-12 sm:flex-row sm:items-start sm:gap-20"
       >
-        {/* Left column */}
-        <div className="sm:sticky sm:top-24 sm:w-60 sm:flex-shrink-0">
-          <SectionLabel>Parcours</SectionLabel>
+        {/* ── Left column ── */}
+        <div className="sm:sticky sm:top-24 sm:w-64 sm:flex-shrink-0">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-green-600">
+            Parcours
+          </p>
           <TextReveal
             as="h2"
-            className="mt-2 block text-3xl font-light tracking-heading text-gradient"
+            className="font-display mt-2 block text-3xl font-medium tracking-display text-[#1e293b]"
           >
             Formation
           </TextReveal>
-          <p className="mt-4 text-sm font-light leading-relaxed text-white/35">
-            Deux ans de BTS SIO puis un Bachelor Web pour maîtriser la conception
-            d'applications fullstack modernes.
+          <p className="mt-4 text-sm leading-relaxed text-[#64748b]">
+            Deux ans de BTS SIO puis un Bachelor Web pour maîtriser la
+            conception d'applications fullstack modernes.
           </p>
 
-          {/* Availability badge */}
-          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-cyan-500/20 bg-cyan-500/[0.06] px-4 py-2 text-xs font-light text-cyan-400/80">
+          {/* Availability banner */}
+          <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-4 py-2 text-xs font-medium text-green-700">
             <span className="relative flex h-1.5 w-1.5 flex-shrink-0">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-50" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-cyan-500" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-60" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-600" />
             </span>
             Disponible alternance 2025-2026 · MyDigitalSchool Caen
           </div>
 
-          <CVPreview />
+          <CVCard />
         </div>
 
-        {/* Right — timeline */}
+        {/* ── Right column — timeline ── */}
         <div className="flex-1">
           <motion.ol
             variants={container}
             initial="hidden"
             whileInView="visible"
-            viewport={{ once: true }}
-            className="relative space-y-10 border-l border-white/[0.07] pl-8"
+            viewport={{ once: true, margin: "-60px" }}
+            className="relative space-y-10 border-l-2 border-[#e2e8f0] pl-8"
           >
             {config.education.map((edu, i) => (
               <motion.li key={i} variants={row} className="relative">
-                <span className="absolute -left-[calc(2rem+4px)] top-1.5 h-2 w-2 rounded-full border border-white/20 bg-white/10" />
-                <p className="text-[11px] font-light uppercase tracking-[0.15em] text-white/25">
+                <span className="absolute -left-[calc(2rem+5px)] top-1.5 h-2.5 w-2.5 rounded-full border-2 border-green-500 bg-white" />
+                <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-green-600">
                   {edu.year}
                 </p>
-                <h3 className="mt-1.5 text-base font-normal text-white/75">
+                <h3 className="mt-1.5 text-base font-semibold text-[#1e293b]">
                   {edu.degree}
                 </h3>
-                <p className="mt-1 text-sm font-light text-white/35">
+                <p className="mt-1 text-sm text-[#64748b]">
                   {edu.school} — {edu.location}
                 </p>
               </motion.li>
@@ -174,13 +149,15 @@ export default function About() {
           </motion.ol>
 
           {/* Languages */}
-          <div className="mt-14 border-t border-white/[0.06] pt-10">
-            <SectionLabel>Langues</SectionLabel>
+          <div className="mt-14 border-t border-[#e2e8f0] pt-10">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#94a3b8]">
+              Langues
+            </p>
             <div className="mt-5 flex flex-wrap gap-3">
               {config.languages.map((lang) => (
-                <div key={lang.name} className="glass-card rounded-xl px-4 py-2.5">
-                  <p className="text-sm font-normal text-white/70">{lang.name}</p>
-                  <p className="text-xs font-light text-white/30">{lang.level}</p>
+                <div key={lang.name} className="card rounded-xl px-4 py-2.5">
+                  <p className="text-sm font-semibold text-[#1e293b]">{lang.name}</p>
+                  <p className="text-xs text-[#94a3b8]">{lang.level}</p>
                 </div>
               ))}
             </div>

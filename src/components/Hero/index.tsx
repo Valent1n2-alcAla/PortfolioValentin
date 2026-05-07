@@ -1,73 +1,67 @@
 import { motion } from "framer-motion";
 import { config } from "../../data/config";
-import TextReveal from "../TextReveal";
 import { useMagnetic } from "../../hooks/useMagnetic";
 
-const ease = [0.16, 1, 0.3, 1] as const;
+const ease = [0.22, 1, 0.36, 1] as const;
+
+function fadeUp(delay = 0) {
+  return {
+    initial: { opacity: 0, y: 28 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.7, delay, ease },
+  };
+}
 
 export default function Hero() {
   const { name, email } = config.identity;
-
-  const magContact = useMagnetic<HTMLAnchorElement>(0.3);
-  const magProjects = useMagnetic<HTMLAnchorElement>(0.25);
+  const magContact  = useMagnetic<HTMLAnchorElement>(0.28);
+  const magProjects = useMagnetic<HTMLAnchorElement>(0.22);
 
   return (
     <section
       id="hero"
-      className="flex min-h-[92vh] flex-col items-center justify-center px-6 text-center"
+      className="mx-auto flex max-w-5xl flex-col items-start justify-center px-6 py-32 sm:py-44"
     >
-      {/* Badge */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease }}
-        className="mb-8"
-      >
-        <span className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 text-xs font-light text-white/60 backdrop-blur-sm">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+      {/* Availability badge */}
+      <motion.div {...fadeUp(0)} className="mb-8">
+        <span className="inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-3.5 py-1 text-xs font-medium text-green-700">
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-60" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-600" />
           </span>
-          Disponible pour alternance — MyDigitalSchool Caen
+          Disponible pour alternance — Septembre 2025
         </span>
       </motion.div>
 
-      {/* Name — text reveal */}
-      <TextReveal
-        as="h1"
-        className="text-gradient block text-5xl font-light tracking-display sm:text-7xl lg:text-8xl"
-        delay={0.05}
+      {/* Title — Playfair Display serif */}
+      <motion.h1
+        {...fadeUp(0.08)}
+        className="font-display text-5xl font-medium tracking-display text-[#1e293b] sm:text-7xl lg:text-8xl"
       >
         {name}
-      </TextReveal>
+      </motion.h1>
 
       {/* Role */}
       <motion.p
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.35, ease }}
-        className="mt-5 text-xl font-light text-white/35 tracking-wide"
+        {...fadeUp(0.18)}
+        className="mt-5 text-xl font-light text-[#64748b]"
       >
-        Développeur Fullstack
+        Développeur Web Fullstack
       </motion.p>
 
-      {/* Tagline */}
+      {/* Human tagline */}
       <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 0.5, ease }}
-        className="mt-4 max-w-lg text-sm font-light leading-relaxed text-white/30"
+        {...fadeUp(0.26)}
+        className="mt-4 max-w-xl text-base font-light leading-relaxed text-[#94a3b8]"
       >
-        Symfony · Spring Boot · React · Kotlin
+        Passionné par l'architecture logicielle et les interfaces durables.{" "}
+        <span className="text-[#64748b]">
+          Futur Bachelor Web à MyDigitalSchool Caen.
+        </span>
       </motion.p>
 
-      {/* CTAs — magnetic */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.6, ease }}
-        className="mt-12 flex flex-wrap items-center justify-center gap-4"
-      >
+      {/* CTAs */}
+      <motion.div {...fadeUp(0.36)} className="mt-10 flex flex-wrap items-center gap-4">
         <motion.a
           ref={magContact.ref}
           href={`mailto:${email}`}
@@ -75,7 +69,7 @@ export default function Hero() {
           transition={{ type: "spring", stiffness: 300, damping: 20, mass: 0.5 }}
           onMouseMove={magContact.onMouseMove}
           onMouseLeave={magContact.onMouseLeave}
-          className="rounded-full border border-white/15 bg-white/[0.06] px-7 py-2.5 text-sm font-light text-white/80 backdrop-blur-sm transition-colors hover:border-white/30 hover:text-white"
+          className="rounded-full bg-[#1e293b] px-7 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#0f172a]"
         >
           Me contacter
         </motion.a>
@@ -87,7 +81,7 @@ export default function Hero() {
           transition={{ type: "spring", stiffness: 300, damping: 20, mass: 0.5 }}
           onMouseMove={magProjects.onMouseMove}
           onMouseLeave={magProjects.onMouseLeave}
-          className="rounded-full px-7 py-2.5 text-sm font-light text-white/35 transition-colors hover:text-white/70"
+          className="rounded-full border border-[#e2e8f0] px-7 py-2.5 text-sm font-medium text-[#64748b] transition-all hover:border-[#cbd5e1] hover:text-[#1e293b]"
         >
           Voir mes projets →
         </motion.a>
