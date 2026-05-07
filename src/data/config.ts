@@ -1,8 +1,6 @@
 export interface Project {
   title: string;
   subtitle: string;
-  description: string;
-  highlights: string[];
   tags: string[];
   span: "wide" | "normal";
   github: string;
@@ -16,13 +14,6 @@ export const projects: Project[] = [
   {
     title: "InterVizio",
     subtitle: "Projet réalisé en stage",
-    description:
-      "Plateforme de pilotage pour interventions techniques terrain. Conçue pour rationaliser le cycle complet, de la demande client à la pré-facturation.",
-    highlights: [
-      "Planification optimisée des trajets pour techniciens",
-      "Module de pré-facturation automatisé",
-      "Odin — assistant IA dédié au support terrain",
-    ],
     tags: ["PHP", "Symfony", "IA", "KPI Dashboards"],
     span: "wide",
     github: GITHUB,
@@ -32,13 +23,6 @@ export const projects: Project[] = [
   {
     title: "E-Music",
     subtitle: "Projet en cours de développement",
-    description:
-      "Solution full-stack Admin / Profs / Élèves pour la gestion administrative et pédagogique d'un établissement musical.",
-    highlights: [
-      "Plannings interactifs & suivi des dossiers",
-      "Facturation modulée par tranches de revenus",
-      "Inventaire et contrats de prêt instrumental",
-    ],
     tags: ["Symfony 7", "PHP 8.2", "MariaDB", "Turbo", "Stimulus"],
     span: "normal",
     github: GITHUB,
@@ -47,13 +31,6 @@ export const projects: Project[] = [
   {
     title: "Portfolio 2026",
     subtitle: "Projet personnel",
-    description:
-      "Vitrine technologique personnelle axée sur l'UI/UX et la performance. Design minimaliste « Clean Tech » avec accents verts — le projet que vous consultez.",
-    highlights: [
-      "Animations fluides & scroll reveal",
-      "Structure scalable React lazy/Suspense",
-      "Optimisation SEO & Core Web Vitals",
-    ],
     tags: ["React", "TypeScript", "Framer Motion", "Tailwind CSS"],
     span: "normal",
     github: GITHUB,
