@@ -23,11 +23,13 @@ class ContactController extends AbstractController
         $contact->setSubject($data['subject'] ?? 'Message depuis le portfolio');
         $contact->setMessage($data['message'] ?? '');
 
-        dd($contact);
-
         $entityManager->persist($contact);
         $entityManager->flush();
 
-        return new JsonResponse(['status' => 'success', 'id' => $contact->getId()], 201);
+        return new JsonResponse([
+            'status'  => 'success',
+            'message' => 'Message enregistré avec succès.',
+            'id'      => $contact->getId(),
+        ], 201);
     }
 }
