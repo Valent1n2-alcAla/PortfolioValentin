@@ -69,7 +69,7 @@ function CVCard() {
       <div className="border-t border-[#e2e8f0] px-5 py-4">
         <motion.a
           ref={ref}
-          href="/CV_Valentin_Alcala.pdf"
+          href="./public/CV_Valentin_Alcala_Developpeur_Web_Alternance.pdf"
           download
           animate={{ x: offset.x, y: offset.y }}
           transition={{ type: "spring", stiffness: 300, damping: 20, mass: 0.5 }}
