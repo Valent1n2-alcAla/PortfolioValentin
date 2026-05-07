@@ -14,21 +14,22 @@ export const projects: Project[] = [
     subtitle: "Projet réalisé en stage",
     span: "wide",
     github: GITHUB,
-    image: "https://placehold.co/800x420/f0fdf4/059669?text=InterVizio",
+    badge: "IA • Odin",
+    image: "./public/img/intervizio.jpg",
   },
   {
     title: "E-Music",
     subtitle: "Projet en cours de développement",
     span: "normal",
     github: GITHUB,
-    image: "https://placehold.co/600x420/f0fdf4/059669?text=E-Music",
+    image: "./public/img/emusic.jpg",
   },
   {
     title: "Portfolio 2026",
     subtitle: "Projet personnel",
     span: "normal",
     github: GITHUB,
-    image: "https://placehold.co/600x420/f0fdf4/059669?text=Portfolio+2026",
+    image: "./public/portfolio-2026.png",
   },
 ];
 
