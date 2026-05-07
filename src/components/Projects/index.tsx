@@ -26,11 +26,15 @@ function ProjectCard({ project }: { project: Project }) {
       ].join(" ")}
     >
       {/* Image */}
-      <div className="relative flex items-center justify-center bg-slate-50 p-4" style={{ height: 220 }}>
+      <div
+        className="relative flex items-center justify-center bg-white p-5"
+        style={{ height: 220, borderBottom: "1px solid #e2e8f0" }}
+      >
         <img
           src={project.image}
           alt={`Aperçu ${project.title}`}
           className="h-full w-full object-contain transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+          style={{ filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.08))" }}
         />
         {/* AI badge */}
         {project.badge && (
