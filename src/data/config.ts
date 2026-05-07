@@ -15,7 +15,7 @@ const GITHUB = "https://github.com/Valent1n2-alcAla";
 export const projects: Project[] = [
   {
     title: "InterVizio",
-    subtitle: "SaaS · Gestion d'Interventions",
+    subtitle: "Réalisé en stage",
     description:
       "Plateforme de pilotage pour interventions techniques terrain. Conçue pour rationaliser le cycle complet, de la demande client à la pré-facturation.",
     highlights: [
@@ -31,7 +31,7 @@ export const projects: Project[] = [
   },
   {
     title: "E-Music",
-    subtitle: "ERP · École de Musique",
+    subtitle: "Projet en cours",
     description:
       "Solution full-stack Admin / Profs / Élèves pour la gestion administrative et pédagogique d'un établissement musical.",
     highlights: [
@@ -46,7 +46,7 @@ export const projects: Project[] = [
   },
   {
     title: "Portfolio 2026",
-    subtitle: "Expérience Immersive",
+    subtitle: "Projet personnel",
     description:
       "Vitrine technologique personnelle axée sur l'UI/UX et la performance. Design minimaliste « Clean Tech » avec accents verts — le projet que vous consultez.",
     highlights: [
