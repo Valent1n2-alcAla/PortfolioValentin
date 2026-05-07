@@ -117,7 +117,7 @@ export default function About() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-60" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-green-600" />
             </span>
-            Disponible alternance 2024-2025
+            Disponible alternance 2025-2026 · MyDigitalSchool Caen
           </div>
 
           <CVCard />
