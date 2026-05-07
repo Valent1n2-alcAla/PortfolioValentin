@@ -30,7 +30,7 @@ export default function Navbar() {
         </ul>
 
         <a
-          href="/CV_Valentin_Alcala.pdf"
+          href="./public/CV_Valentin_Alcala_Developpeur_Web_Alternance.pdf"
           download
           className="rounded-full bg-green-600 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-green-700"
         >
