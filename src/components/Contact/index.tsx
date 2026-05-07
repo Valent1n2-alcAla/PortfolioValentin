@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { config } from "../../data/config";
@@ -70,16 +70,30 @@ function Field({ label, id, type = "text", rows, value, error, touched, disabled
 }
 
 const EMPTY_FORM: FormValues = { name: "", email: "", message: "" };
+const AUTO_DISMISS_MS = 5000;
 
 export default function Contact() {
   const [form, setForm]       = useState<FormValues>(EMPTY_FORM);
   const [errors, setErrors]   = useState<Partial<FormValues>>({});
   const [touched, setTouched] = useState<Partial<Record<FormField, boolean>>>({});
   const [status, setStatus]   = useState<Status>("idle");
+  // Honeypot — doit rester vide
+  const [website, setWebsite] = useState("");
 
+  const dismissTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { ref: btnRef, offset, onMouseMove, onMouseLeave } = useMagnetic<HTMLButtonElement>(0.22);
 
   const isSubmitting = status === "submitting";
+
+  // Auto-dismiss success/error après 5 s
+  useEffect(() => {
+    if (status === "success" || status === "error") {
+      dismissTimer.current = setTimeout(() => setStatus("idle"), AUTO_DISMISS_MS);
+    }
+    return () => {
+      if (dismissTimer.current) clearTimeout(dismissTimer.current);
+    };
+  }, [status]);
 
   function handleChange(field: FormField, value: string) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -119,6 +133,7 @@ export default function Contact() {
           email:   form.email,
           subject: "Message depuis le portfolio",
           message: form.message,
+          website, // honeypot — vide pour les humains
         }),
       });
 
@@ -128,6 +143,7 @@ export default function Contact() {
       setForm(EMPTY_FORM);
       setTouched({});
       setErrors({});
+      setWebsite("");
     } catch {
       setStatus("error");
     }
@@ -169,64 +185,69 @@ export default function Contact() {
         </motion.div>
 
         {/* Right */}
-        <AnimatePresence mode="wait">
-          {status === "success" ? (
-            <motion.div key="ok"
-              initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, ease }}
-              className="card flex flex-col items-center justify-center gap-4 rounded-2xl p-10 text-center"
-            >
-              <CheckCircle className="text-green-500" size={30} />
-              <p className="text-sm font-medium text-[#1e293b]">Message envoyé, merci !</p>
-              <p className="text-xs text-[#94a3b8]">Je vous répondrai dans les plus brefs délais.</p>
-              <button
-                onClick={() => setStatus("idle")}
-                className="mt-2 text-xs text-green-600 underline underline-offset-2 hover:text-green-700"
+        <div>
+          <AnimatePresence mode="wait">
+            {status === "success" && (
+              <motion.div key="ok"
+                initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.4, ease }}
+                className="mb-4 flex items-center gap-3 rounded-2xl border border-green-100 bg-green-50 px-5 py-4"
               >
-                Envoyer un autre message
-              </button>
-            </motion.div>
-          ) : (
-            <motion.form key="form"
-              initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }} transition={{ duration: 0.65, ease }}
-              onSubmit={handleSubmit}
-              className="card flex flex-col gap-5 rounded-2xl p-6"
-              noValidate
-            >
-              <Field label="Nom"     id="name"    value={form.name}    error={errors.name}    touched={!!touched.name}    disabled={isSubmitting} onChange={(v) => handleChange("name", v)}    onBlur={() => handleBlur("name")} />
-              <Field label="Email"   id="email"   type="email" value={form.email}   error={errors.email}   touched={!!touched.email}   disabled={isSubmitting} onChange={(v) => handleChange("email", v)}   onBlur={() => handleBlur("email")} />
-              <Field label="Message" id="message" rows={4}     value={form.message} error={errors.message} touched={!!touched.message} disabled={isSubmitting} onChange={(v) => handleChange("message", v)} onBlur={() => handleBlur("message")} />
+                <CheckCircle className="flex-shrink-0 text-green-500" size={18} />
+                <div>
+                  <p className="text-sm font-medium text-green-800">Message envoyé, merci !</p>
+                  <p className="text-xs text-green-600">Je vous répondrai dans les plus brefs délais.</p>
+                </div>
+              </motion.div>
+            )}
 
-              {/* API error banner */}
-              <AnimatePresence>
-                {status === "error" && (
-                  <motion.div key="api-err"
-                    initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.2 }}
-                    className="flex items-center gap-2 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600"
-                  >
-                    <AlertCircle size={14} className="flex-shrink-0" />
-                    Oups, une erreur est survenue. Réessayez ou contactez-moi par email.
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              <motion.button
-                ref={btnRef} type="submit" disabled={isSubmitting}
-                animate={{ x: offset.x, y: offset.y }}
-                transition={{ type: "spring", stiffness: 300, damping: 20, mass: 0.5 }}
-                onMouseMove={onMouseMove} onMouseLeave={onMouseLeave}
-                className="mt-1 inline-flex items-center gap-2 self-start rounded-full bg-green-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+            {status === "error" && (
+              <motion.div key="err-banner"
+                initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.4, ease }}
+                className="mb-4 flex items-center gap-3 rounded-2xl border border-red-100 bg-red-50 px-5 py-4"
               >
-                {isSubmitting
-                  ? <><Loader2 size={13} className="animate-spin" /> Envoi…</>
-                  : <><Send size={13} /> Envoyer</>
-                }
-              </motion.button>
-            </motion.form>
-          )}
-        </AnimatePresence>
+                <AlertCircle className="flex-shrink-0 text-red-400" size={18} />
+                <p className="text-sm text-red-700">
+                  Oups, une erreur est survenue. Réessayez ou écrivez-moi par email.
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <motion.form
+            initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }} transition={{ duration: 0.65, ease }}
+            onSubmit={handleSubmit}
+            className="card flex flex-col gap-5 rounded-2xl p-6"
+            noValidate
+          >
+            {/* Honeypot — caché aux visiteurs, piège pour les bots */}
+            <input
+              type="text" name="website" value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              tabIndex={-1} aria-hidden="true" autoComplete="off"
+              style={{ position: "absolute", opacity: 0, pointerEvents: "none", height: 0 }}
+            />
+
+            <Field label="Nom"     id="name"    value={form.name}    error={errors.name}    touched={!!touched.name}    disabled={isSubmitting} onChange={(v) => handleChange("name", v)}    onBlur={() => handleBlur("name")} />
+            <Field label="Email"   id="email"   type="email" value={form.email}   error={errors.email}   touched={!!touched.email}   disabled={isSubmitting} onChange={(v) => handleChange("email", v)}   onBlur={() => handleBlur("email")} />
+            <Field label="Message" id="message" rows={4}     value={form.message} error={errors.message} touched={!!touched.message} disabled={isSubmitting} onChange={(v) => handleChange("message", v)} onBlur={() => handleBlur("message")} />
+
+            <motion.button
+              ref={btnRef} type="submit" disabled={isSubmitting}
+              animate={{ x: offset.x, y: offset.y }}
+              transition={{ type: "spring", stiffness: 300, damping: 20, mass: 0.5 }}
+              onMouseMove={onMouseMove} onMouseLeave={onMouseLeave}
+              className="mt-1 inline-flex items-center gap-2 self-start rounded-full bg-green-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSubmitting
+                ? <><Loader2 size={13} className="animate-spin" /> Envoi…</>
+                : <><Send size={13} /> Envoyer</>
+              }
+            </motion.button>
+          </motion.form>
+        </div>
       </div>
     </section>
   );
