@@ -10,17 +10,18 @@
         "doctrine/doctrine-bundle": "^2.11",
         "doctrine/doctrine-migrations-bundle": "^3.3",
         "doctrine/orm": "^3.1",
+        "nelmio/cors-bundle": "^2.4",
         "symfony/console": "7.*",
         "symfony/dotenv": "7.*",
         "symfony/flex": "^2",
         "symfony/framework-bundle": "7.*",
+        "symfony/google-mailer": "7.*",
         "symfony/mailer": "7.*",
         "symfony/runtime": "7.*",
         "symfony/serializer": "7.*",
+        "symfony/twig-bundle": "7.*",
         "symfony/validator": "7.*",
-        "symfony/yaml": "7.*",
-        "nelmio/cors-bundle": "^2.4",
-        "symfony/twig-bundle": "7.*"
+        "symfony/yaml": "7.*"
     },
     "require-dev": {
         "symfony/maker-bundle": "^1.57"
