@@ -1,5 +1,4 @@
 import { motion } from "framer-motion";
-import { Github, Sparkles } from "lucide-react";
 import { projects, type Project } from "../../data/config";
 import TextReveal from "../TextReveal";
 
@@ -32,29 +31,12 @@ function ProjectCard({ project }: { project: Project }) {
           alt={`Aperçu ${project.title}`}
           className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
         />
-        {project.badge && (
-          <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-white/95 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 backdrop-blur-sm">
-            <Sparkles size={10} />
-            {project.badge}
-          </span>
-        )}
       </div>
 
-      {/* Footer */}
-      <div className="flex items-center justify-between gap-3 px-5 py-4">
-        <div>
-          <h3 className="text-sm font-bold text-[#1e293b]">{project.title}</h3>
-          <p className="mt-0.5 text-xs text-slate-500">{project.subtitle}</p>
-        </div>
-        <a
-          href={project.github}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Voir sur GitHub"
-          className="flex-shrink-0 rounded-full p-1.5 text-slate-300 transition-all duration-200 hover:bg-emerald-50 hover:text-emerald-600 group-hover:text-emerald-500"
-        >
-          <Github size={14} strokeWidth={1.8} />
-        </a>
+      {/* Title + Subtitle */}
+      <div className="px-5 py-4">
+        <h3 className="text-sm font-bold text-[#1e293b]">{project.title}</h3>
+        <p className="mt-0.5 text-xs text-slate-500">{project.subtitle}</p>
       </div>
     </motion.article>
   );
